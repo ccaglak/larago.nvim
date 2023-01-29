@@ -2,6 +2,7 @@ local M = {}
 
 M.root_patterns = { ".git", "lua", "vendor", "node_modules" }
 
+-- special thanks folke - https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/util/init.lua
 function M.rootDir()
     local path = vim.api.nvim_buf_get_name(0)
     path = path ~= "" and vim.loop.fs_realpath(path) or nil
