@@ -20,8 +20,7 @@ M.getRoot = function(language, bufnr)
     return tree:root(), bufnr
 end
 
-M.rgSearch = function(file)
-    local rootDir = rt.rootDir()
+M.parsed_dir = function(file)
     local path = "/resources/views/"
     if #file == 1 then
         path = path
@@ -33,6 +32,11 @@ M.rgSearch = function(file)
             end
         end
     end
+    return path
+end
+M.rgSearch = function(file)
+    local rootDir = rt.rootDir()
+    local path = M.parsed_dir(file)
     local rg = Job:new({
         command = "rg",
         args = { "-g", file[1] .. '.blade.php', "--files", rootDir .. path },
@@ -84,8 +88,9 @@ M.view = function(node)
             vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
             return
         end
+        local path = M.parsed_dir(split) -- need some refactoring
         vim.cmd("e " ..
-            vim.fn.fnameescape(rt.rootDir() .. "/resources/views/" .. split[1] .. "/" .. split[2] .. ".blade.php"))
+            vim.fn.fnameescape(rt.rootDir() .. path .. split[#split] .. ".blade.php"))
     end
 end
 
