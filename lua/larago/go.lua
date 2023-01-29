@@ -33,7 +33,6 @@ M.rgSearch = function(file)
             end
         end
     end
-    P(path)
     local rg = Job:new({
         command = "rg",
         args = { "-g", file[1] .. '.blade.php', "--files", rootDir .. path },
