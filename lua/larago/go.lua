@@ -21,7 +21,8 @@ M.getRoot = function(language, bufnr)
 end
 
 M.parsed_dir = function(file)
-    local path = "/resources/views/"
+    local rootDir = rt.rootDir()
+    local path = rootDir .. "/resources/views/"
     if #file == 1 then
         path = path
     else
@@ -34,12 +35,10 @@ M.parsed_dir = function(file)
     end
     return path
 end
-M.rgSearch = function(file)
-    local rootDir = rt.rootDir()
-    local path = M.parsed_dir(file)
+M.rgSearch = function(path, file)
     local rg = Job:new({
         command = "rg",
-        args = { "-g", file[1] .. '.blade.php', "--files", rootDir .. path },
+        args = { "-g", file .. '.blade.php', "--files", path },
     })
     rg:sync()
     return unpack(rg:result())
@@ -83,14 +82,14 @@ M.view = function(node)
         local val = trs.children(arg, 'argument')
         local split = {}
         for word in val:gmatch("%w+") do table.insert(split, word) end
-        local bladeFile = M.rgSearch(split)
+        local path = M.parsed_dir(split) -- need some refactoring
+        local bladeFile = M.rgSearch(path, split[#split])
         if bladeFile ~= nil then
             vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
             return
         end
-        local path = M.parsed_dir(split) -- need some refactoring
         vim.cmd("e " ..
-            vim.fn.fnameescape(rt.rootDir() .. path .. split[#split] .. ".blade.php"))
+            vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
     end
 end
 
