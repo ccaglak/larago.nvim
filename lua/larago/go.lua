@@ -6,7 +6,7 @@ local pop   = require('larago.ui')
 local rt    = require("larago.rootDir")
 local trs   = require('larago.treesitter')
 local utils = require('larago.utils')
-
+local List  = require("plenary.collections.py_list")
 
 local M = {}
 
@@ -26,10 +26,14 @@ M.rgSearch = function(file)
     if #file == 1 then
         path = path
     else
-        for _, value in pairs(file) do
-            path = path .. value .. "/"
+
+        for i, value in pairs(file) do
+            if i < #file then
+                path = path .. value .. "/"
+            end
         end
     end
+    P(path)
     local rg = Job:new({
         command = "rg",
         args = { "-g", file[1] .. '.blade.php', "--files", rootDir .. path },
