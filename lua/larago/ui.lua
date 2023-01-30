@@ -1,17 +1,15 @@
 local popup = require('plenary.popup')
-local List = require("plenary.collections.py_list")
 local rt = require('larago.rootDir')
 
 local M = {}
 
-function table.map(list, alter)
-    local ret = {}
+function table.map(list, fn)
+    local r = {}
     for i, value in ipairs(list) do
-        local new = alter(value, i)
-        table.insert(ret, new)
+        local new = fn(value, i)
+        table.insert(r, new)
     end
-
-    return ret
+    return r
 end
 
 local win, opts = nil, nil

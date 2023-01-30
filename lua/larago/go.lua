@@ -1,40 +1,33 @@
+
 local ts    = vim.treesitter
-local tq    = require("vim.treesitter.query")
 local Job   = require("plenary.job")
 local tags  = require("larago.tags")
 local pop   = require('larago.ui')
 local rt    = require("larago.rootDir")
 local trs   = require('larago.treesitter')
 local utils = require('larago.utils')
-local List  = require("plenary.collections.py_list")
+
+local sep = utils.path_sep()
 
 local M = {}
 
--- vim.bo.filetype
--- vim.bo.filename
-
-M.getRoot = function(language, bufnr)
-    bufnr = bufnr or vim.api.nvim_get_current_buf()
-    local parser = ts.get_parser(bufnr, language, {})
-    local tree = parser:parse()[1]
-    return tree:root(), bufnr
-end
+-- note to self camelcase vs snakecase
 
 M.parsed_dir = function(file)
     local rootDir = rt.rootDir()
-    local path = rootDir .. "/resources/views/"
+    local path = rootDir .. sep .. "resources" .. sep .. "views" .. sep
     if #file == 1 then
         path = path
     else
-
         for i, value in pairs(file) do
             if i < #file then
-                path = path .. value .. "/"
+                path = path .. value .. sep
             end
         end
     end
     return path
 end
+
 M.rgSearch = function(path, file)
     local rg = Job:new({
         command = "rg",
@@ -49,13 +42,11 @@ M.rgcSearch = function(file)
     local rg = Job:new({
         command = "rg",
         -- rg -g 'Route.php' --files ./
-        args = { "-g", file .. '.blade.php', "--files", rootDir .. "/resources" },
+        args = { "-g", file .. '.blade.php', "--files", rootDir .. sep .. "resources" },
     })
     rg:sync()
     return rg:result()
 end
-
-
 
 M.to = function()
     utils.filetype()
