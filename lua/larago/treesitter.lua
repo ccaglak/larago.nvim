@@ -1,16 +1,16 @@
-local ts = vim.treesitter
+local ts, api = vim.treesitter, vim.api
 local M = {}
 
 M.getRoot = function(language, bufnr)
-    bufnr = bufnr or vim.api.nvim_get_current_buf()
+    bufnr = bufnr or api.nvim_get_current_buf()
     local parser = ts.get_parser(bufnr, language, {})
     local tree = parser:parse()[1]
     return tree:root(), bufnr
 end
 
 M.cursor = function()
-    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-    local node = vim.treesitter.get_node_at_pos(0, row - 1, col, {})
+    local row, col = unpack(api.nvim_win_get_cursor(0))
+    local node = ts.get_node_at_pos(0, row - 1, col, {})
     return node
 end
 
@@ -45,8 +45,8 @@ M.child_type = function(node, type)
         if child:type() == type then
             break
         end
-        id = id + 1
         child = node:child(id)
+        id = id + 1
     end
     return child
 end

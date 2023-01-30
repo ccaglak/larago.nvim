@@ -12,7 +12,7 @@ function table.map(list, fn)
     return r
 end
 
-local win, opts = nil, nil
+local win, _ = nil, nil
 local buf_nr
 local function close_popup()
     vim.api.nvim_win_close(win, true)
@@ -23,21 +23,19 @@ local selected = {}
 function M.popup(results)
     selected = results
     buf_nr = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_option(buf_nr, 'bufhidden', 'wipe')
     vim.api.nvim_buf_set_option(buf_nr, 'buftype', 'nofile')
     vim.api.nvim_buf_set_option(buf_nr, 'filetype', "larago")
     local parsedir = table.map(results, function(v)
         return v:gsub(rootDir, "")
     end)
     vim.api.nvim_buf_set_lines(buf_nr, 0, -1, true, parsedir)
-    -- modifiable at first, then set readonly
     vim.api.nvim_buf_set_option(buf_nr, 'modifiable', false)
     local width = 70
     local height = 10
     local borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }
     local title = "PHPNamespace"
 
-    win, opts = popup.create(buf_nr, {
+    win, _ = popup.create(buf_nr, {
         line = math.floor(((vim.o.lines - height) / 2) - 1),
         col = math.floor((vim.o.columns - width) / 2),
         minwidth = width,
@@ -50,7 +48,6 @@ function M.popup(results)
     vim.api.nvim_win_set_option(win, "number", true)
     vim.api.nvim_win_set_option(win, 'wrap', false)
     vim.api.nvim_buf_set_option(buf_nr, "bufhidden", "delete")
-    vim.api.nvim_buf_set_option(buf_nr, 'modifiable', false)
     vim.api.nvim_buf_set_keymap(
         buf_nr,
         'n',

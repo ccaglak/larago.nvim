@@ -1,6 +1,6 @@
 ## larago.nvim
 
-Neovim Laravel goto blade/components - tested on mac
+Neovim Laravel goto blade/components 
 
 [![asciicast](https://asciinema.org/a/555376.svg)](https://asciinema.org/a/555376)
 
