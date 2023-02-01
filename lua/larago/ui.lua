@@ -71,7 +71,6 @@ function M.selectItem()
     close_popup()
     selected = {}
     vim.cmd("e " .. vim.fn.fnameescape(selectedline))
-
 end
 
 return M

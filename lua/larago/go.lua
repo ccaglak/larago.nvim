@@ -95,13 +95,12 @@ M.tag = function(node)
     for word in cmp:gmatch("%w+") do
         table.insert(split, word)
     end
-    local rc = M.rgcSearch(split[2])
+    local rc = M.rgcSearch(split[#split])
     if #rc > 1 then
         pop.popup(rc)
         return
-    end 
+    end
     vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
 end
 
 return M
-
