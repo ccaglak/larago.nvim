@@ -1,5 +1,5 @@
 local popup = require('plenary.popup')
-local rt = require('larago.rootDir')
+local rd = require('larago.root')
 
 local M = {}
 
@@ -18,7 +18,7 @@ local function close_popup()
     vim.api.nvim_win_close(win, true)
 end
 
-local rootDir = rt.rootDir()
+local rootDir = rd.root_dir()
 local selected = {}
 function M.popup(results)
     selected = results

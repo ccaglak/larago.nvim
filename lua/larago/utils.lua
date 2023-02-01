@@ -13,8 +13,8 @@ M.filetype = function()
 end
 
 M.path_sep = function()
-    local win = vim.loop.os_uname().version == 'WindowsNT'
-    return win and '\\' or '/'
+    local win = vim.loop.os_uname().sysname == 'Darwin' or "Linux"
+    return win and '/' or '\\'
 end
 
 return M

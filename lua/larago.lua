@@ -1,10 +1,10 @@
 -- main module file
-local lago = require("larago.go")
+local lara = require("larago.go")
 
 local M = {}
 
 M.go = function()
-    lago.to()
+    lara.to()
 end
 
 return M
