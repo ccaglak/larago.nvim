@@ -47,10 +47,18 @@ M.rgcSearch = function(file)
     return rg:result()
 end
 
+M.split = function(str)
+    local words = {}
+    for word in str:gmatch("%w+") do
+        table.insert(words, word)
+    end
+    return words
+end
+
 M.to = function()
     utils.filetype()
     local node = nil
-    for _, value in pairs({ "function_call_expression", "tag_name" }) do
+    for _, value in pairs({ "function_call_expression", "tag_name", "text" }) do
         node = trs.parent(value)
         if node ~= nil then
             local type = node:type()
@@ -60,9 +68,20 @@ M.to = function()
             elseif type == "tag_name" then
                 M.tag(node)
                 break
+            elseif type == "text" then
+                M.include()
             end
         end
     end
+end
+
+M.include = function()
+    local line = vim.api.nvim_get_current_line()
+    local text = string.match(line, [['([^']+)]])
+    local split = M.split(text)
+    local path = M.parsed_dir(split)
+    local bladeFile = M.rgSearch(path, split[#split])
+    vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
 end
 
 M.view = function(node)
