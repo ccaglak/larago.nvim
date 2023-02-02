@@ -114,6 +114,7 @@ M.view = function(node)
     if fn == "view" then
         local arg = trs.child(node, "arguments")
         local val = trs.children(arg, "argument")
+        val = val:gsub("'", "")
         local split = spliter(val)
         local path = M.parsed_dir(split) -- need some refactoring
         local bladeFile = M.rgSearch(path, split[#split])
