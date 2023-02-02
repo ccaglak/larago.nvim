@@ -47,14 +47,6 @@ M.rgcSearch = function(file)
     return rg:result()
 end
 
-M.split = function(str)
-    local words = {}
-    for word in str:gmatch("%w+") do
-        table.insert(words, word)
-    end
-    return words
-end
-
 M.to = function()
     utils.filetype()
     local node = nil
@@ -70,8 +62,10 @@ M.to = function()
                 break
             elseif type == "text" then
                 M.include()
+                break
             elseif type == "nowdoc_string" then
                 M.nowdoc(node)
+                break
             end
         end
     end
