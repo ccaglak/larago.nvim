@@ -93,7 +93,16 @@ end
 
 M.include = function(line)
     line = line or vim.api.nvim_get_current_line()
-    local txt = string.match(line, [['([^']+)]])
+    local txt = string.match(line, [[include%('([^']+)]])
+    if txt == nil then
+        txt = string.match(line, [[livewire%('([^']+)]])
+        local split = spliter(txt)
+        local rc = M.rgcSearch(split[#split])
+        if #rc > 1 then
+            pop.popup(rc)
+            return
+        end
+    end
     local split = spliter(txt)
     local path = M.parsed_dir(split)
     local bladeFile = M.rgSearch(path, split[#split])
