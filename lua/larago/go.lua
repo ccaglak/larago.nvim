@@ -77,8 +77,9 @@ M.to = function()
     end
 end
 
-local spliter = function(path)
-    local format = string.format("([^%s]+)", '.')
+local spliter = function(path, sepa)
+    sepa = sepa or "."
+    local format = string.format("([^%s]+)", sepa)
     local t = {}
     for str in string.gmatch(path, format) do
         table.insert(t, str)
@@ -132,7 +133,7 @@ M.tag = function(node)
         vim.api.nvim_echo({ { "Native Html Tag", "Function" }, { " " } }, true, {})
         return
     end
-    local split = spliter(cmp)
+    local split = spliter(cmp,'-')
     local rc = M.rgcSearch(split[#split])
     if #rc > 1 then
         pop.popup(rc)
