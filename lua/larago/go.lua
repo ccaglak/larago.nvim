@@ -58,7 +58,7 @@ end
 M.to = function()
     utils.filetype()
     local node = nil
-    for _, value in pairs({ "function_call_expression", "tag_name", "text" }) do
+    for _, value in pairs({ "function_call_expression", "tag_name", "text", "nowdoc_string" }) do
         node = trs.parent(value)
         if node ~= nil then
             local type = node:type()
@@ -70,13 +70,20 @@ M.to = function()
                 break
             elseif type == "text" then
                 M.include()
+            elseif type == "nowdoc_string" then
+                M.nowdoc(node)
             end
         end
     end
 end
 
-M.include = function()
-    local line = vim.api.nvim_get_current_line()
+M.nowdoc = function(node)
+    local line = trs.get_name(node)
+    M.include(line)
+end
+
+M.include = function(line)
+    line = line or vim.api.nvim_get_current_line()
     local text = string.match(line, [['([^']+)]])
     local split = M.split(text)
     local path = M.parsed_dir(split)

@@ -36,7 +36,8 @@ Neovim Laravel goto blade/components
 - Goto blade files
 - Goto components
 - Goto Livewire components
-- Goto include files  - excluding complex just ex. @include('admin.notification.alert.bell')
+- Goto include files  - excluding complex stuff ex. @include('admin.notification.alert.bell')
+- Goto partials from livewire class
 
 ## Requires
 
