@@ -77,6 +77,15 @@ M.to = function()
     end
 end
 
+local spliter = function(path)
+    local format = string.format("([^%s]+)", '.')
+    local t = {}
+    for str in string.gmatch(path, format) do
+        table.insert(t, str)
+    end
+    return t
+end
+
 M.nowdoc = function(node)
     local line = trs.get_name(node)
     M.include(line)
@@ -84,8 +93,8 @@ end
 
 M.include = function(line)
     line = line or vim.api.nvim_get_current_line()
-    local text = string.match(line, [['([^']+)]])
-    local split = M.split(text)
+    local txt = string.match(line, [['([^']+)]])
+    local split = spliter(txt)
     local path = M.parsed_dir(split)
     local bladeFile = M.rgSearch(path, split[#split])
     vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
@@ -96,10 +105,7 @@ M.view = function(node)
     if fn == "view" then
         local arg = trs.child(node, "arguments")
         local val = trs.children(arg, "argument")
-        local split = {}
-        for word in val:gmatch("%w+") do
-            table.insert(split, word)
-        end
+        local split = spliter(val)
         local path = M.parsed_dir(split) -- need some refactoring
         local bladeFile = M.rgSearch(path, split[#split])
         if bladeFile ~= nil then
@@ -116,11 +122,7 @@ M.tag = function(node)
         vim.api.nvim_echo({ { "Native Html Tag", "Function" }, { " " } }, true, {})
         return
     end
-
-    local split = {}
-    for word in cmp:gmatch("%w+") do
-        table.insert(split, word)
-    end
+    local split = spliter(cmp)
     local rc = M.rgcSearch(split[#split])
     if #rc > 1 then
         pop.popup(rc)
