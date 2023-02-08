@@ -47,6 +47,7 @@ Neovim Laravel goto blade/components
 
 ## Basic Usage
 
+-    One keymap goto all the features listed above.
 -   `:GoBlade` goto blade on cursor
 -   `:GoBlade` goto component on cursor
 -    creates view buffer if cant find it. return view('blog.index') hit your fav keymap.
