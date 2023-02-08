@@ -92,16 +92,6 @@ M.component = function(node)
     end
 end
 
-local spliter = function(path, sepa)
-    sepa = sepa or "."
-    local format = string.format("([^%s]+)", sepa)
-    local t = {}
-    for str in string.gmatch(path, format) do
-        table.insert(t, str)
-    end
-    return t
-end
-
 M.nowdoc = function(node)
     local line = trs.get_name(node)
     M.include(line)
@@ -112,14 +102,14 @@ M.include = function(line)
     local txt = string.match(line, [[include%('([^']+)]])
     if txt == nil then
         txt = string.match(line, [[livewire%('([^']+)]])
-        local split = spliter(txt)
+        local split = utils.spliter(txt)
         local rc = M.rgcSearch(split[#split])
         if #rc > 1 then
             pop.popup(rc)
             return
         end
     end
-    local split = spliter(txt)
+    local split = utils.spliter(txt)
     local path = M.parsed_dir(split)
     local bladeFile = M.rgSearch(path, split[#split])
     vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
@@ -137,7 +127,7 @@ M.view = function(node)
             return
         end
         val = val:gsub("'", "")
-        local split = spliter(val)
+        local split = utils.spliter(val)
         local path = M.parsed_dir(split) -- need some refactoring
         local bladeFile = M.rgSearch(path, split[#split])
         if bladeFile ~= nil then
@@ -148,6 +138,14 @@ M.view = function(node)
     end
 end
 
+M.search = function(search)
+    local rc = M.rgcSearch(search)
+    if #rc > 1 then
+        pop.popup(rc)
+        return
+    end
+    vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
+end
 
 M.tag = function(node)
     if vim.bo.filetype ~= "html" then
@@ -162,12 +160,20 @@ M.tag = function(node)
         vim.notify_once("Native HTML Tag")
         return
     end
-
-    if cmp:find(":", 1, true) then --self_closing_tag
+    if cmp:find(":", 1, true) then
+        local scmp = utils.spliter(cmp, ":")
+        local na = trs.get_name(node:next_sibling())
+        if na ~= nil then
+            na:gsub("'", "")
+            na = na:sub(2)
+            M.search(na)
+        else
+            M.search(scmp[#scmp])
+        end
         return
     end
 
-    local split = spliter(cmp, "-")
+    local split = utils.spliter(cmp, "-")
     local rc = M.rgcSearch(split[#split])
     if #rc > 1 then
         pop.popup(rc)

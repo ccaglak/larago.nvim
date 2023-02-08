@@ -34,9 +34,10 @@ Neovim Laravel goto blade/components
 
 ## Features
 - Goto blade files ex. view('goto.larago')
-- goto  tag ex. x-jet-section-border
+- goto  tag ex. '<'x-jet-button'>'
 - Goto  ex. @include('admin.notification.alert.bell')
 - Goto  ex. @livewire('teams.delete-team-form', ['team' => $team])
+- Goto  tag '<'livewire:calendars.holiday-calendar'>'
 
 ## Requires
 
