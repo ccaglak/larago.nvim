@@ -33,10 +33,10 @@ Neovim Laravel goto blade/components
 ```
 
 ## Features
-- Goto blade files view('goto.larago')
-- goto  <x-jet-section-border />
-- Goto  @include('admin.notification.alert.bell')
-- Goto  @livewire('teams.delete-team-form', ['team' => $team])
+- Goto blade files ex. view('goto.larago')
+- goto  tag ex. x-jet-section-border
+- Goto  ex. @include('admin.notification.alert.bell')
+- Goto  ex. @livewire('teams.delete-team-form', ['team' => $team])
 
 ## Requires
 
