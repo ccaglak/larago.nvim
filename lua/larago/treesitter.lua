@@ -55,7 +55,7 @@ M.children = function(cnode, type)
     cnode = cnode or M.cursor()
     for node, _ in cnode:iter_children() do
         if node:type() == type then
-            return M.get_name(node) --  perhaps returning node could be better idea
+            return M.get_name(node), node --  perhaps returning node could be better idea
         end
     end
 end

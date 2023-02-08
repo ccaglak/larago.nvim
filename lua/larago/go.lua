@@ -28,9 +28,9 @@ end
 
 M.rgSearch = function(path, file)
     local rg = Job:new({
-        command = "rg",
-        args = { "-g", file .. ".blade.php", "--files", path },
-    })
+            command = "rg",
+            args = { "-g", file .. ".blade.php", "--files", path },
+        })
     rg:sync()
     return unpack(rg:result())
 end
@@ -39,10 +39,10 @@ end
 M.rgcSearch = function(file)
     local rd = rt.root_dir()
     local rg = Job:new({
-        command = "rg",
-        -- rg -g 'Route.php' --files ./
-        args = { "-g", file .. ".blade.php", "--files", rd .. sep .. "resources" },
-    })
+            command = "rg",
+            -- rg -g 'Route.php' --files ./
+            args = { "-g", file .. ".blade.php", "--files", rd .. sep .. "resources" },
+        })
     rg:sync()
     return rg:result()
 end
@@ -71,16 +71,6 @@ M.to = function()
     end
 end
 
-local spliter = function(path, sepa)
-    sepa = sepa or "."
-    local format = string.format("([^%s]+)", sepa)
-    local t = {}
-    for str in string.gmatch(path, format) do
-        table.insert(t, str)
-    end
-    return t
-end
-
 M.nowdoc = function(node)
     local line = trs.get_name(node)
     M.include(line)
@@ -91,14 +81,14 @@ M.include = function(line)
     local txt = string.match(line, [[include%('([^']+)]])
     if txt == nil then
         txt = string.match(line, [[livewire%('([^']+)]])
-        local split = spliter(txt)
+        local split = utils.spliter(txt)
         local rc = M.rgcSearch(split[#split])
         if #rc > 1 then
             pop.popup(rc)
             return
         end
     end
-    local split = spliter(txt)
+    local split = utils.spliter(txt)
     local path = M.parsed_dir(split)
     local bladeFile = M.rgSearch(path, split[#split])
     vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
@@ -110,7 +100,7 @@ M.view = function(node)
         local arg = trs.child(node, "arguments")
         local val = trs.children(arg, "argument")
         val = val:gsub("'", "")
-        local split = spliter(val)
+        local split = utils.spliter(val)
         local path = M.parsed_dir(split) -- need some refactoring
         local bladeFile = M.rgSearch(path, split[#split])
         if bladeFile ~= nil then
@@ -127,7 +117,7 @@ M.tag = function(node)
         vim.api.nvim_echo({ { "Native Html Tag", "Function" }, { " " } }, true, {})
         return
     end
-    local split = spliter(cmp,'-')
+    local split = utils.spliter(cmp, '-')
     local rc = M.rgcSearch(split[#split])
     if #rc > 1 then
         pop.popup(rc)
