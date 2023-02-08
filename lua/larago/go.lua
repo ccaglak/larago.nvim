@@ -48,7 +48,7 @@ end
 M.to = function()
     utils.filetype()
     local node = nil
-    for _, value in pairs({ "function_call_expression", "tag_name", "text", "nowdoc_string" }) do
+    for _, value in pairs({ "function_call_expression", "tag_name", "text", "nowdoc_string", "attribute" }) do
         node = trs.parent(value)
         if node ~= nil then
             local type = node:type()
@@ -56,6 +56,9 @@ M.to = function()
                 M.view(node)
                 break
             elseif type == "tag_name" then
+                M.tag(node)
+                break
+            elseif type == "attribute" then
                 M.tag(node)
                 break
             elseif type == "text" then
@@ -151,6 +154,9 @@ M.tag = function(node)
     if vim.bo.filetype ~= "html" then
         return
     end
+    if node:type() == "attribute" then
+        node = node:prev_sibling()
+    end
     local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
     if cmp == nil then
         return
@@ -160,6 +166,7 @@ M.tag = function(node)
         vim.notify_once("Native HTML Tag")
         return
     end
+    ::att::
     if cmp:find(":", 1, true) then
         local scmp = utils.spliter(cmp, ":")
         local na = trs.get_name(node:next_sibling())
