@@ -10,7 +10,6 @@ local sep = utils.path_sep()
 
 local M = {}
 
--- note to self camelcase vs snakecase
 M.parsed_dir = function(file)
     local rd = rt.root_dir()
     local path = rd .. sep .. "resources" .. sep .. "views" .. sep
@@ -34,7 +33,6 @@ M.rgSearch = function(path, file)
     rg:sync()
     return unpack(rg:result())
 end
-
 
 M.rgcSearch = function(file)
     local rd = rt.root_dir()
@@ -71,34 +69,17 @@ M.to = function()
     end
 end
 
-M.nowdoc = function(node)
-    local line = trs.get_name(node)
-    M.include(line)
-end
-
-M.include = function(line)
-    line = line or vim.api.nvim_get_current_line()
-    local txt = string.match(line, [[include%('([^']+)]])
-    if txt == nil then
-        txt = string.match(line, [[livewire%('([^']+)]])
-        local split = utils.spliter(txt)
-        local rc = M.rgcSearch(split[#split])
-        if #rc > 1 then
-            pop.popup(rc)
-            return
-        end
+M.component = function(node)
+    if vim.bo.filetype ~= "php" then
+        return
     end
-    local split = utils.spliter(txt)
-    local path = M.parsed_dir(split)
-    local bladeFile = M.rgSearch(path, split[#split])
-    vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
-end
-
-M.view = function(node)
     local fn = trs.get_name(trs.child(node, "function"))
     if fn == "view" then
         local arg = trs.child(node, "arguments")
         local val = trs.children(arg, "argument")
+        if val == nil then
+            return
+        end
         val = val:gsub("'", "")
         local split = utils.spliter(val)
         local path = M.parsed_dir(split) -- need some refactoring
@@ -111,13 +92,82 @@ M.view = function(node)
     end
 end
 
-M.tag = function(node)
-    local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
-    if tags:contains(cmp) then
-        vim.api.nvim_echo({ { "Native Html Tag", "Function" }, { " " } }, true, {})
+local spliter = function(path, sepa)
+    sepa = sepa or "."
+    local format = string.format("([^%s]+)", sepa)
+    local t = {}
+    for str in string.gmatch(path, format) do
+        table.insert(t, str)
+    end
+    return t
+end
+
+M.nowdoc = function(node)
+    local line = trs.get_name(node)
+    M.include(line)
+end
+
+M.include = function(line)
+    line = line or vim.api.nvim_get_current_line()
+    local txt = string.match(line, [[include%('([^']+)]])
+    if txt == nil then
+        txt = string.match(line, [[livewire%('([^']+)]])
+        local split = spliter(txt)
+        local rc = M.rgcSearch(split[#split])
+        if #rc > 1 then
+            pop.popup(rc)
+            return
+        end
+    end
+    local split = spliter(txt)
+    local path = M.parsed_dir(split)
+    local bladeFile = M.rgSearch(path, split[#split])
+    vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
+end
+
+M.view = function(node)
+    if vim.bo.filetype ~= "php" then
         return
     end
-    local split = utils.spliter(cmp, '-')
+    local fn = trs.get_name(trs.child(node, "function"))
+    if fn == "view" then
+        local arg = trs.child(node, "arguments")
+        local val = trs.children(arg, "argument")
+        if val == nil then
+            return
+        end
+        val = val:gsub("'", "")
+        local split = spliter(val)
+        local path = M.parsed_dir(split) -- need some refactoring
+        local bladeFile = M.rgSearch(path, split[#split])
+        if bladeFile ~= nil then
+            vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
+            return
+        end
+        vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
+    end
+end
+
+
+M.tag = function(node)
+    if vim.bo.filetype ~= "html" then
+        return
+    end
+    local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
+    if cmp == nil then
+        return
+    end
+
+    if tags:contains(cmp) then
+        vim.notify_once("Native HTML Tag")
+        return
+    end
+
+    if cmp:find(":", 1, true) then --self_closing_tag
+        return
+    end
+
+    local split = spliter(cmp, "-")
     local rc = M.rgcSearch(split[#split])
     if #rc > 1 then
         pop.popup(rc)
