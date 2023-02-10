@@ -38,11 +38,11 @@ Neovim Laravel goto blade/components
 - Goto  ex. @include('admin.notification.alert.bell')
 - Goto  ex. @livewire('teams.delete-team-form', ['team' => $team])
 - Goto  tag '<'livewire:calendars.holiday-calendar'>'
-
+- Goto ->name('profile.edit');
 ## Requires
 
 -   pleanery.nvim
--   treesitter
+-   treesitter "TSInstall php"
 -   brew install ripgrep
 
 ## Basic Usage

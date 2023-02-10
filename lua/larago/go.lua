@@ -47,13 +47,15 @@ end
 
 M.to = function()
     utils.filetype()
-    local node = nil
-    for _, value in pairs({ "function_call_expression", "tag_name", "text", "nowdoc_string", "attribute" }) do
-        node = trs.parent(value)
+    for _, value in pairs({ "function_call_expression", 'member_call_expression', "tag_name", "text", "nowdoc_string", "attribute" }) do
+        local node = trs.parent(value)
         if node ~= nil then
             local type = node:type()
             if type == "function_call_expression" then
                 M.view(node)
+                break
+            elseif type == "member_call_expression" then
+                M.route_name(node)
                 break
             elseif type == "tag_name" then
                 M.tag(node)
@@ -69,29 +71,6 @@ M.to = function()
                 break
             end
         end
-    end
-end
-
-M.component = function(node)
-    if vim.bo.filetype ~= "php" then
-        return
-    end
-    local fn = trs.get_name(trs.child(node, "function"))
-    if fn == "view" then
-        local arg = trs.child(node, "arguments")
-        local val = trs.children(arg, "argument")
-        if val == nil then
-            return
-        end
-        val = val:gsub("'", "")
-        local split = utils.spliter(val)
-        local path = M.parsed_dir(split) -- need some refactoring
-        local bladeFile = M.rgSearch(path, split[#split])
-        if bladeFile ~= nil then
-            vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
-            return
-        end
-        vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
     end
 end
 
@@ -118,6 +97,28 @@ M.include = function(line)
     vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
 end
 
+M.route_name = function(node)
+    if vim.bo.filetype ~= "php" then
+        return
+    end
+    local fn = trs.get_name(trs.child(node, "name"))
+    if fn == "name" then
+        local arg = trs.child(node, "arguments")
+        local val = trs.children(arg, "argument")
+        if val == nil then
+            return
+        end
+        val = val:gsub("'", "")
+        local split = utils.spliter(val)
+        local path = M.parsed_dir(split) -- need some refactoring
+        local bladeFile = M.rgSearch(path, split[#split])
+        if bladeFile ~= nil then
+            vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
+            return
+        end
+        vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
+    end
+end
 M.view = function(node)
     if vim.bo.filetype ~= "php" then
         return
@@ -166,7 +167,7 @@ M.tag = function(node)
         vim.notify_once("Native HTML Tag")
         return
     end
-    ::att::
+
     if cmp:find(":", 1, true) then
         local scmp = utils.spliter(cmp, ":")
         local na = trs.get_name(node:next_sibling())
