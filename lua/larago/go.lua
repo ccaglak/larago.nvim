@@ -27,9 +27,9 @@ end
 
 M.rgSearch = function(path, file)
     local rg = Job:new({
-            command = "rg",
-            args = { "-g", file .. ".blade.php", "--files", path },
-        })
+        command = "rg",
+        args = { "-g", file .. ".blade.php", "--files", path },
+    })
     rg:sync()
     return unpack(rg:result())
 end
@@ -37,10 +37,10 @@ end
 M.rgcSearch = function(file)
     local rd = rt.root_dir()
     local rg = Job:new({
-            command = "rg",
-            -- rg -g 'Route.php' --files ./
-            args = { "-g", file .. ".blade.php", "--files", rd .. sep .. "resources" },
-        })
+        command = "rg",
+        -- rg -g 'Route.php' --files ./
+        args = { "-g", file .. ".blade.php", "--files", rd .. sep .. "resources" },
+    })
     rg:sync()
     return rg:result()
 end
@@ -116,6 +116,8 @@ M.route_name = function(node)
             vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
             return
         end
+        os.execute("mkdir -p " .. vim.fn.fnameescape(path))
+        os.execute("touch " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
         vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
     end
 end
@@ -138,6 +140,8 @@ M.view = function(node)
             vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
             return
         end
+        os.execute("mkdir -p " .. vim.fn.fnameescape(path))
+        os.execute("touch " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
         vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
     end
 end
