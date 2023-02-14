@@ -10,6 +10,18 @@ local sep = utils.path_sep()
 
 local M = {}
 
+vim.api.nvim_create_autocmd("BufWritePre", {
+    group = vim.api.nvim_create_augroup("auto_create_dir", { clear = true }),
+    callback = function(event)
+        local file = vim.loop.fs_realpath(event.match) or event.match
+
+        vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+        local backup = vim.fn.fnamemodify(file, ":p:~:h")
+        backup = backup:gsub("[/\\]", "%%")
+        vim.go.backupext = backup
+    end,
+})
+
 M.parsed_dir = function(file)
     local rd = rt.root_dir()
     local path = rd .. sep .. "resources" .. sep .. "views" .. sep
@@ -116,8 +128,6 @@ M.route_name = function(node)
             vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
             return
         end
-        os.execute("mkdir -p " .. vim.fn.fnameescape(path))
-        os.execute("touch " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
         vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
     end
 end
@@ -140,8 +150,6 @@ M.view = function(node)
             vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
             return
         end
-        os.execute("mkdir -p " .. vim.fn.fnameescape(path))
-        os.execute("touch " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
         vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
     end
 end
