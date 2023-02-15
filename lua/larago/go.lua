@@ -59,7 +59,14 @@ end
 
 M.to = function()
     utils.filetype()
-    for _, value in pairs({ "function_call_expression", 'member_call_expression', "tag_name", "text", "nowdoc_string", "attribute" }) do
+    for _, value in pairs({
+        "function_call_expression",
+        "member_call_expression",
+        "tag_name",
+        "text",
+        "nowdoc_string",
+        "attribute",
+    }) do
         local node = trs.parent(value)
         if node ~= nil then
             local type = node:type()
@@ -88,6 +95,9 @@ end
 
 M.nowdoc = function(node)
     local line = trs.get_name(node)
+    if line == nil then
+        return
+    end
     M.include(line)
 end
 
@@ -96,6 +106,9 @@ M.include = function(line)
     local txt = string.match(line, [[include%('([^']+)]])
     if txt == nil then
         txt = string.match(line, [[livewire%('([^']+)]])
+        if txt == nil then
+            return
+        end
         local split = utils.spliter(txt)
         local rc = M.rgcSearch(split[#split])
         if #rc > 1 then
@@ -168,7 +181,11 @@ M.tag = function(node)
         return
     end
     if node:type() == "attribute" then
-        node = node:prev_sibling()
+        -- node = node:prev_sibling()
+        _, node = node.prev_sibling(node, "tag_name")
+        if node == nil then
+            return
+        end
     end
     local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
     if cmp == nil then

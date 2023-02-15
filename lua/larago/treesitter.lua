@@ -60,4 +60,13 @@ M.children = function(cnode, type)
     end
 end
 
+M.prev_sibling= function(cnode, type)
+    cnode = cnode or M.cursor()
+    for node, _ in cnode:prev_sibling() do
+        if node:type() == type then
+            return M.get_name(node), node --  perhaps returning node could be better idea
+        end
+    end
+end
+
 return M
