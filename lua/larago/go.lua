@@ -63,6 +63,7 @@ M.to = function()
         "function_call_expression",
         "member_call_expression",
         "tag_name",
+        "start_tag",
         "text",
         "nowdoc_string",
         "attribute",
@@ -87,6 +88,11 @@ M.to = function()
                 break
             elseif type == "nowdoc_string" then
                 M.nowdoc(node)
+                break
+            elseif type == "start_tag" then
+                local _
+                _, node = trs.children(node, "tag_name")
+                M.tag(node)
                 break
             end
         end
