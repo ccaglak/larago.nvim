@@ -64,6 +64,7 @@ M.to = function()
         "member_call_expression",
         "tag_name",
         "start_tag",
+        "self_closing_tag",
         "text",
         "nowdoc_string",
         "attribute",
@@ -78,6 +79,9 @@ M.to = function()
                 M.route_name(node)
                 break
             elseif type == "tag_name" then
+                M.tag(node)
+                break
+            elseif type == "self_closing_tag" then
                 M.tag(node)
                 break
             elseif type == "attribute" then
@@ -188,7 +192,7 @@ M.tag = function(node)
     end
     if node:type() == "attribute" then
         -- node = node:prev_sibling()
-        _, node = node.prev_sibling(node, "tag_name")
+        _, node = trs.prev_sibling(node, "tag_name")
         if node == nil then
             return
         end
@@ -217,7 +221,11 @@ M.tag = function(node)
     end
 
     local split = utils.spliter(cmp, "-")
-    local rc = M.rgcSearch(split[#split])
+    local search = split[#split]
+    if #split > 3 then
+        search = split[#split - 1] .. "-" .. split[#split]
+    end
+    local rc = M.rgcSearch(search)
     if #rc > 1 then
         pop.popup(rc)
         return
