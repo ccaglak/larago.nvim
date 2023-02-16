@@ -63,7 +63,6 @@ M.to = function()
         "function_call_expression",
         "member_call_expression",
         "tag_name",
-        "attribute",
         "self_closing_tag",
         "text",
         "nowdoc_string",
@@ -81,10 +80,10 @@ M.to = function()
             elseif type == "tag_name" then
                 M.tag(node)
                 break
+                -- elseif type == "attribute" then
+                --     M.tag(node)
+                --     break
             elseif type == "self_closing_tag" then
-                M.tag(node)
-                break
-            elseif type == "attribute" then
                 M.tag(node)
                 break
             elseif type == "text" then
@@ -190,13 +189,22 @@ M.tag = function(node)
     if vim.bo.filetype ~= "html" then
         return
     end
-    if node:type() == "attribute" then
-        -- node = node:prev_sibling()
-        _, node = trs.prev_sibling(node, "tag_name")
-        if node == nil then
-            return
-        end
+    -- if node:type() == "attribute" then
+    --     -- node = node:prev_sibling()
+    --     _, node = trs.prev_sibling(node, "tag_name")
+    --     if node == nil then
+    --         return
+    --     end
+    -- end
+    --
+
+    local att = trs.get_name(node:next_sibling())
+    if att ~= nil then
+        att = att:sub(2)
+        M.search(att)
+        return
     end
+
     local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
     if cmp == nil then
         return
@@ -222,18 +230,15 @@ M.tag = function(node)
 
     local split = utils.spliter(cmp, "-")
     local search = split[#split]
-    if search == "layout" then
+    P(search)
+    if search == "layouts" then
         search = split[#split - 1]
     end
     if #split > 3 then
         search = split[#split - 1] .. "-" .. split[#split]
     end
     local rc = M.rgcSearch(search)
-    if #rc > 1 then
-        pop.popup(rc)
-        return
-    end
-    vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
+    M.search(rc)
 end
 
 return M
