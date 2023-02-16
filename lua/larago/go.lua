@@ -212,7 +212,7 @@ M.tag = function(node)
 
     local nt = node:next_sibling()
     local att = trs.get_name(nt)
-    if cmp:find(".", 1, true) then
+    if att:find(".", 1, true) then
         if nt:type() == 'attribute' then
             if att ~= nil then
                 att = att:sub(2)
