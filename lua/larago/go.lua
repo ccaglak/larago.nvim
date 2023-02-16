@@ -209,13 +209,16 @@ M.tag = function(node)
         vim.notify_once("Native HTML Tag")
         return
     end
+
     local nt = node:next_sibling()
-    if nt:type() == 'attribute' then
-        local att = trs.get_name(nt)
-        if att ~= nil then
-            att = att:sub(2)
-            M.search(att)
-            return
+    local att = trs.get_name(nt)
+    if cmp:find(".", 1, true) then
+        if nt:type() == 'attribute' then
+            if att ~= nil then
+                att = att:sub(2)
+                M.search(att)
+                return
+            end
         end
     end
 
@@ -234,7 +237,8 @@ M.tag = function(node)
 
     local split = utils.spliter(cmp, "-")
     local search = split[#split]
-    if search == "layouts" or "layout" then
+
+    if search == "layouts" or search == "layout" then
         search = split[#split - 1]
     end
     if #split > 3 then
