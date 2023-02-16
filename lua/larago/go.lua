@@ -198,21 +198,25 @@ M.tag = function(node)
     -- end
     --
 
-    local att = trs.get_name(node:next_sibling())
-    if att ~= nil then
-        att = att:sub(2)
-        M.search(att)
-        return
-    end
 
     local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
     if cmp == nil then
         return
     end
 
+
     if tags:contains(cmp) then
         vim.notify_once("Native HTML Tag")
         return
+    end
+    local nt = node:next_sibling()
+    if nt:type() == 'attribute' then
+        local att = trs.get_name(nt)
+        if att ~= nil then
+            att = att:sub(2)
+            M.search(att)
+            return
+        end
     end
 
     if cmp:find(":", 1, true) then
@@ -230,15 +234,13 @@ M.tag = function(node)
 
     local split = utils.spliter(cmp, "-")
     local search = split[#split]
-    P(search)
     if search == "layouts" then
         search = split[#split - 1]
     end
     if #split > 3 then
         search = split[#split - 1] .. "-" .. split[#split]
     end
-    local rc = M.rgcSearch(search)
-    M.search(rc)
+    M.search(search)
 end
 
 return M
