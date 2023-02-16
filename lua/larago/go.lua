@@ -234,7 +234,7 @@ M.tag = function(node)
 
     local split = utils.spliter(cmp, "-")
     local search = split[#split]
-    if search == "layouts" then
+    if search == "layouts" or "layout" then
         search = split[#split - 1]
     end
     if #split > 3 then
