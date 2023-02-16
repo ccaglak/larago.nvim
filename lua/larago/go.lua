@@ -63,11 +63,11 @@ M.to = function()
         "function_call_expression",
         "member_call_expression",
         "tag_name",
-        "start_tag",
+        "attribute",
         "self_closing_tag",
         "text",
         "nowdoc_string",
-        "attribute",
+        "start_tag",
     }) do
         local node = trs.parent(value)
         if node ~= nil then
@@ -222,6 +222,9 @@ M.tag = function(node)
 
     local split = utils.spliter(cmp, "-")
     local search = split[#split]
+    if search == "layout" then
+        search = split[#split - 1]
+    end
     if #split > 3 then
         search = split[#split - 1] .. "-" .. split[#split]
     end
