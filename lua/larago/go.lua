@@ -214,11 +214,9 @@ M.tag = function(node)
     local att = trs.get_name(nt)
     if att:find(".", 1, true) then
         if nt:type() == 'attribute' then
-            if att ~= nil then
-                att = att:sub(2)
-                M.search(att)
-                return
-            end
+            att = att:sub(2)
+            M.search(att)
+            return
         end
     end
 
