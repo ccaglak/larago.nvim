@@ -80,9 +80,6 @@ M.to = function()
             elseif type == "tag_name" then
                 M.tag(node)
                 break
-                -- elseif type == "attribute" then
-                --     M.tag(node)
-                --     break
             elseif type == "self_closing_tag" then
                 M.tag(node)
                 break
@@ -189,21 +186,11 @@ M.tag = function(node)
     if vim.bo.filetype ~= "html" then
         return
     end
-    -- if node:type() == "attribute" then
-    --     -- node = node:prev_sibling()
-    --     _, node = trs.prev_sibling(node, "tag_name")
-    --     if node == nil then
-    --         return
-    --     end
-    -- end
-    --
-
 
     local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
     if cmp == nil then
         return
     end
-
 
     if tags:contains(cmp) then
         vim.notify_once("Native HTML Tag")
@@ -213,7 +200,7 @@ M.tag = function(node)
     local nt = node:next_sibling()
     local att = trs.get_name(nt)
     if att:find(".", 1, true) then
-        if nt:type() == 'attribute' then
+        if nt:type() == "attribute" then
             att = att:sub(2)
             M.search(att)
             return
@@ -242,7 +229,20 @@ M.tag = function(node)
     if #split > 3 then
         search = split[#split - 1] .. "-" .. split[#split]
     end
-    M.search(search)
+
+    local rc = M.rgcSearch(search)
+
+    if #rc > 1 then
+        pop.popup(rc)
+        return
+    end
+    if #rc == 0 then
+        search = split[#split - 1] .. "-" .. split[#split]
+        M.search(search)
+        return
+    end
+
+    vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
 end
 
 return M
