@@ -121,6 +121,7 @@ M.include = function(line)
             pop.popup(rc)
             return
         end
+        vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
     end
     local split = utils.spliter(txt)
     local path = M.parsed_dir(split)
@@ -232,10 +233,12 @@ M.tag = function(node)
 
     local rc = M.rgcSearch(search)
 
+
     if #rc > 1 then
         pop.popup(rc)
         return
     end
+
     if #rc == 0 then
         search = split[#split - 1] .. "-" .. split[#split]
         M.search(search)
