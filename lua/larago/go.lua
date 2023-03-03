@@ -122,6 +122,7 @@ M.include = function(line)
             return
         end
         vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
+        return
     end
     local split = utils.spliter(txt)
     local path = M.parsed_dir(split)
@@ -232,7 +233,6 @@ M.tag = function(node)
     end
 
     local rc = M.rgcSearch(search)
-
 
     if #rc > 1 then
         pop.popup(rc)
