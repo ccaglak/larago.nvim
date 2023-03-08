@@ -107,6 +107,26 @@ M.nowdoc = function(node)
     M.include(line)
 end
 
+M._toBlade = function(txt)
+    local split = utils.spliter(txt)
+    local path = M.parsed_dir(split)
+    local bladeFile = M.rgSearch(path, split[#split])
+    if bladeFile ~= nil then
+        vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
+        return
+    end
+    vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
+end
+
+M.search = function(search)
+    local rc = M.rgcSearch(search)
+    if #rc > 1 then
+        pop.popup(rc)
+        return
+    end
+    vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
+end
+
 M.include = function(line)
     line = line or vim.api.nvim_get_current_line()
     local txt = string.match(line, [[include%('([^']+)]])
@@ -116,18 +136,10 @@ M.include = function(line)
             return
         end
         local split = utils.spliter(txt)
-        local rc = M.rgcSearch(split[#split])
-        if #rc > 1 then
-            pop.popup(rc)
-            return
-        end
-        vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
+        M.search(split[#split])
         return
     end
-    local split = utils.spliter(txt)
-    local path = M.parsed_dir(split)
-    local bladeFile = M.rgSearch(path, split[#split])
-    vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
+    M._toBlade(txt)
 end
 
 M.route_name = function(node)
@@ -142,16 +154,10 @@ M.route_name = function(node)
             return
         end
         val = val:gsub("'", "")
-        local split = utils.spliter(val)
-        local path = M.parsed_dir(split) -- need some refactoring
-        local bladeFile = M.rgSearch(path, split[#split])
-        if bladeFile ~= nil then
-            vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
-            return
-        end
-        vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
+        M._toBlade(val)
     end
 end
+
 M.view = function(node)
     if vim.bo.filetype ~= "php" then
         return
@@ -164,25 +170,10 @@ M.view = function(node)
             return
         end
         val = val:gsub("'", "")
-        local split = utils.spliter(val)
-        local path = M.parsed_dir(split) -- need some refactoring
-        local bladeFile = M.rgSearch(path, split[#split])
-        if bladeFile ~= nil then
-            vim.cmd("e " .. vim.fn.fnameescape(bladeFile))
-            return
-        end
-        vim.cmd("e " .. vim.fn.fnameescape(path .. split[#split] .. ".blade.php"))
+        M._toBlade(val)
     end
 end
 
-M.search = function(search)
-    local rc = M.rgcSearch(search)
-    if #rc > 1 then
-        pop.popup(rc)
-        return
-    end
-    vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
-end
 
 M.tag = function(node)
     if vim.bo.filetype ~= "html" then
@@ -211,7 +202,12 @@ M.tag = function(node)
 
     if cmp:find(":", 1, true) then
         local scmp = utils.spliter(cmp, ":")
+        if scmp[1] == 'livewire' then
+            M.search(scmp[#scmp])
+            return
+        end
         local na = trs.get_name(node:next_sibling())
+
         if na ~= nil then
             na:gsub("'", "")
             na = na:sub(2)
