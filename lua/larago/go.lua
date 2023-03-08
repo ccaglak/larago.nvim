@@ -174,7 +174,7 @@ M.view = function(node)
     end
 end
 
-
+-- this needs to be rewritten
 M.tag = function(node)
     if vim.bo.filetype ~= "html" then
         return
@@ -192,30 +192,16 @@ M.tag = function(node)
 
     local nt = node:next_sibling()
     local att = trs.get_name(nt)
-    if att:find(".", 1, true) then
-        if nt:type() == "attribute" then
-            att = att:sub(2)
-            M.search(att)
-            return
-        end
-    end
 
     if cmp:find(":", 1, true) then
         local scmp = utils.spliter(cmp, ":")
-        if scmp[1] == 'livewire' then
-            M.search(scmp[#scmp])
+
+        local split = utils.spliter(att, ".")
+        if att:find(".", 1, true) then
+            M.search(split[#split])
             return
         end
-        local na = trs.get_name(node:next_sibling())
-
-        if na ~= nil then
-            na:gsub("'", "")
-            na = na:sub(2)
-            M.search(na)
-        else
-            M.search(scmp[#scmp])
-        end
-        return
+        M.search(scmp[#scmp])
     end
 
     local split = utils.spliter(cmp, "-")
