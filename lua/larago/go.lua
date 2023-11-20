@@ -90,7 +90,6 @@ M.to = function()
                 M.nowdoc(node)
                 break
             elseif type == "start_tag" then
-                local _
                 _, node = trs.children(node, "tag_name")
                 M.tag(node)
                 break
@@ -180,7 +179,7 @@ M.tag = function(node)
         return
     end
 
-    local cmp = ts.query.get_node_text(node, 0, {}) -- empty brackets are important
+    local cmp = ts.get_node_text(node, 0, {}) -- empty brackets are important
     if cmp == nil then
         return
     end
@@ -196,8 +195,8 @@ M.tag = function(node)
     if cmp:find(":", 1, true) then
         local scmp = utils.spliter(cmp, ":")
 
-        local split = utils.spliter(att, ".")
         if att:find(".", 1, true) then
+            local split = utils.spliter(att, ".")
             M.search(split[#split])
             return
         end
@@ -229,5 +228,6 @@ M.tag = function(node)
 
     vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
 end
+
 
 return M

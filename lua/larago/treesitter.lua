@@ -16,7 +16,7 @@ end
 
 M.get_name = function(node)
     node = node or M.cursor()
-    return ts.query.get_node_text(node, 0, {}) -- empty brackets are important
+    return ts.get_node_text(node, 0, {}) -- empty brackets are important
 end
 
 M.parent = function(type)
@@ -60,7 +60,7 @@ M.children = function(cnode, type)
     end
 end
 
-M.prev_sibling= function(cnode, type)
+M.prev_sibling = function(cnode, type)
     cnode = cnode or M.cursor()
     for node, _ in cnode:prev_sibling() do
         if node:type() == type then
