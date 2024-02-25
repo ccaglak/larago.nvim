@@ -11,14 +11,17 @@ M.spliter = function(path, sepa)
 end
 
 M.filetype = function()
-    local split = M.spliter(vim.fn.expand("%:t"), ".")
-
-    if #split < 3 then
-        return
-    end
-    local filetype = split[#split - 1] .. "." .. split[#split]
-    if filetype == "blade.php" then
+    if vim.bo.filetype == "blade" then
         vim.cmd([[setfiletype html]])
+    elseif vim.bo.filetype == "php" then
+        local split = M.spliter(vim.fn.expand("%:t"), ".")
+        if #split < 3 then
+            return
+        end
+        local filetype = split[#split - 1] .. "." .. split[#split]
+        if filetype == "blade.php" then
+            vim.cmd([[setfiletype html]])
+        end
     end
 end
 
@@ -27,7 +30,7 @@ function M.setFiletype(buffer, type)
 end
 
 M.path_sep = function()
-    local win = vim.loop.os_uname().sysname == "Darwin" or "Linux"
+    local win = vim.uv.os_uname().sysname == "Darwin" or "Linux"
     return win and "/" or "\\"
 end
 

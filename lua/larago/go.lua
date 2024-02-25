@@ -11,14 +11,12 @@ local sep = utils.path_sep()
 local M = {}
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-    group = vim.api.nvim_create_augroup("auto_create_dir", { clear = true }),
     callback = function(event)
-        local file = vim.loop.fs_realpath(event.match) or event.match
-
-        vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
-        local backup = vim.fn.fnamemodify(file, ":p:~:h")
-        backup = backup:gsub("[/\\]", "%%")
-        vim.go.backupext = backup
+        if event.match:match('^%w%w+://') then
+            return
+        end
+        local file = vim.uv.fs_realpath(event.match) or event.match
+        vim.fn.mkdir(vim.fn.fnamemodify(file, ':p:h'), 'p')
     end,
 })
 
@@ -37,6 +35,7 @@ M.parsed_dir = function(file)
     return path
 end
 
+-- ripgrep local search
 M.rgSearch = function(path, file)
     local rg = Job:new({
         command = "rg",
@@ -46,6 +45,7 @@ M.rgSearch = function(path, file)
     return unpack(rg:result())
 end
 
+-- ripgrep resources search
 M.rgcSearch = function(file)
     local rd = rt.root_dir()
     local rg = Job:new({
@@ -77,10 +77,7 @@ M.to = function()
             elseif type == "member_call_expression" then
                 M.route_name(node)
                 break
-            elseif type == "tag_name" then
-                M.tag(node)
-                break
-            elseif type == "self_closing_tag" then
+            elseif type == "self_closing_tag" or type == "tag_name" then
                 M.tag(node)
                 break
             elseif type == "text" then
@@ -95,6 +92,7 @@ M.to = function()
                 break
             end
         end
+
     end
 end
 
@@ -183,7 +181,6 @@ M.tag = function(node)
     if cmp == nil then
         return
     end
-
     if tags:contains(cmp) then
         vim.notify_once("Native HTML Tag")
         return
@@ -194,6 +191,7 @@ M.tag = function(node)
 
     if cmp:find(":", 1, true) then
         local scmp = utils.spliter(cmp, ":")
+        dd(scmp)
 
         if att:find(".", 1, true) then
             local split = utils.spliter(att, ".")
@@ -201,6 +199,7 @@ M.tag = function(node)
             return
         end
         M.search(scmp[#scmp])
+        return
     end
 
     local split = utils.spliter(cmp, "-")
@@ -212,7 +211,6 @@ M.tag = function(node)
     if #split > 3 then
         search = split[#split - 1] .. "-" .. split[#split]
     end
-
     local rc = M.rgcSearch(search)
 
     if #rc > 1 then
@@ -228,6 +226,5 @@ M.tag = function(node)
 
     vim.cmd("e " .. vim.fn.fnameescape(unpack(rc)))
 end
-
 
 return M
