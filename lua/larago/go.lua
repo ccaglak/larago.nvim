@@ -191,8 +191,6 @@ M.tag = function(node)
 
     if cmp:find(":", 1, true) then
         local scmp = utils.spliter(cmp, ":")
-        dd(scmp)
-
         if att:find(".", 1, true) then
             local split = utils.spliter(att, ".")
             M.search(split[#split])
