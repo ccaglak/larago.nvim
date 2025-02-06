@@ -61,5 +61,8 @@ Neovim Laravel goto blade/components
 
 Php Namespace Resolver [namespace.nvim](https://github.com/ccaglak/namespace.nvim).
 
+## Self Promotion
 
+- [Condo Painters Pro](https://www.condopainterspro.ca)
+ 
 ## License MIT
